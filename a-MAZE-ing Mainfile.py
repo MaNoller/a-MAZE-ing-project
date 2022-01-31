@@ -10,15 +10,28 @@ size = (dims[1]*(width+margin)+margin, dims[0]*(height+margin)+margin)
 
 
 def find_frontier(x,y):
-    if x> 1:
-        pass
+    f=set()
+    if x>= 1:
+        f.add((x-1,y))
     if x < width -1:
-        pass
+        f.add(x+1,y)
     if y>1 :
-        pass
+        f.add(x,y-1)
     if y<height-1:
-        pass
+        f.add(x,y+1)
+    return f
 
+def find_neighbourgs(x,y):
+    n=set()
+    if x>= 1:
+        n.add((x-1,y))
+    if x < width -1:
+        n.add(x+1,y)
+    if y>1 :
+        n.add(x,y-1)
+    if y<height-1:
+        n.add(x,y+1)
+    return n
 
 
 BLACK = (0, 0, 0)
