@@ -72,6 +72,11 @@ while not done:
             gridpos_x=x//(width+margin)#
             gridpos_y=y//(height+margin)
             grid[gridpos_y][gridpos_x]=1
+    Wall_Set=set()
+    Start_Frontier=find_frontier(start_x,start_y)
+    for el in Start_Frontier:
+        Wall_Set.add(el)
+
 
 
 
