@@ -49,6 +49,56 @@ def find_neighbours(x, y):
         # grid[x][y + 1] =3
     return n
 
+def debuild_walls(x,y,nx,ny):
+    if x != nx:
+        if x > nx:
+            pygame.draw.rect(screen, GREEN,
+                             (margin + nx * (width + margin), margin + y * (height + margin), 2 * width + margin,
+                              height))
+        else:
+            pygame.draw.rect(screen, GREEN,
+                             (
+                             margin + x * (width + margin), margin + y * (height + margin), 2 * width + margin, height))
+
+    else:
+        if y > ny:
+            pygame.draw.rect(screen, GREEN,
+                             (margin + x * (width + margin), margin + ny * (height + margin), width,
+                              2 * height + margin))
+        else:
+            pygame.draw.rect(screen, GREEN,
+                             (
+                             margin + x * (width + margin), margin + y * (height + margin), width, 2 * height + margin))
+
+
+def Prym(start_x,start_y):
+    Wall_set = set()
+    fr = find_frontier(start_x, start_y)
+    for el in fr:
+        Wall_set.add(el)
+    while Wall_set:
+        time.sleep(0.002)
+        # print('jo', Wall_set)
+        x, y = random.choice(tuple(Wall_set))
+        Wall_set.remove((x, y))
+        grid[x][y] = 1
+        # print(grid)
+        # print('xy=',x,y)
+        nb_set = find_neighbours(x, y)
+        # print('nbset',nb_set)
+        if nb_set:
+            nx, ny = random.choice(tuple(nb_set))
+            # print('drin')
+            grid[nx][ny] = 1
+            debuild_walls(x, y, nx, ny)
+
+        # print('nxny=',nx,ny)
+        fr = find_frontier(x, y)
+        # print('a',fr)
+        for el in fr:
+            Wall_set.add(el)
+        pygame.display.flip()
+
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -66,10 +116,7 @@ pygame.display.set_caption("My Game")
 grid = np.zeros((dims[0], dims[1]))
 start_x = np.random.randint(grid.shape[0])
 start_y = np.random.randint(grid.shape[1])
-#start_x = 2
-#start_y = 2
 grid[start_x][start_y] = 1
-# print('start:',start_x,start_y)
 
 
 recolor = WHITE
@@ -90,46 +137,7 @@ for row in range(dims[0]):
 pygame.display.flip()
 
 
-Wall_set = set()
-fr = find_frontier(start_x, start_y)
-for el in fr:
-    Wall_set.add(el)
-while Wall_set:
-    time.sleep(0.002)
-    # print('jo', Wall_set)
-    x, y = random.choice(tuple(Wall_set))
-    Wall_set.remove((x, y))
-    grid[x][y] = 1
-    # print(grid)
-    # print('xy=',x,y)
-    nb_set = find_neighbours(x, y)  # ändert sich ned...
-    # print('nbset',nb_set)
-    if nb_set:
-        nx, ny = random.choice(tuple(nb_set))
-        # print('drin')
-        grid[nx][ny] = 1
-        if x != nx:
-            if x > nx:
-                pygame.draw.rect(screen, GREEN,
-                                 (margin + nx * (width + margin), margin + y * (height + margin), 2 * width+margin, height))
-            else:
-                pygame.draw.rect(screen, GREEN,
-                                 (margin + x * (width + margin), margin + y * (height + margin), 2 * width+margin, height))
-
-        else:
-            if y > ny:
-                pygame.draw.rect(screen, GREEN,
-                                 (margin + x * (width + margin), margin + ny * (height + margin), width, 2 * height+margin))
-            else:
-                pygame.draw.rect(screen, GREEN,
-                                 (margin + x * (width + margin), margin + y * (height + margin), width, 2 * height+margin))
-    # print('nxny=',nx,ny)
-    fr = find_frontier(x, y)
-    # print('a',fr)
-    for el in fr:
-        Wall_set.add(el)
-    pygame.display.flip()
-
+Prym(start_x,start_y)
 done = False
 
 clock = pygame.time.Clock()
@@ -172,4 +180,3 @@ while not done:
 
 # Close the window and quit.
 pygame.quit()
-
