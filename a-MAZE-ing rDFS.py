@@ -9,41 +9,20 @@ margin = 3
 dims = [50, 50]
 size = (dims[1] * (width + margin) + margin, dims[0] * (height + margin) + margin)
 
-class Node:
-    def __init__(self,data):
-        self.left=None
-        self.middle=None
-        self.right=None
-        self.value=data
-        self.a, self.b = data
-        grid[self.a][self.b]=1
-
-    def find_neighbour(self):
-        n = set()
-        if self.a >= 1 and grid[self.a - 1][self.b] == 0:
-            n.add((self.a - 1, self.b))
-        if self.a < dims[0] - 1 and grid[self.a + 1][self.b] == 0:
-            n.add((self.a + 1, self.b))
-        if self.b  >= 1 and grid[self.a][self.b - 1] == 0:
-            n.add((self.a, self.b - 1))
-        if self.b  < dims[1] - 1 and grid[self.a][self.b + 1] == 0:
-            n.add((self.a, self.b + 1))
-        return n
 
 
-#grid position is the data of node
-
-#find set of unvisited neighbours
-
-#choose random neighbour
-
-#visit neighbour
-
-#at end go back to last node with unvisited neighbours
-
-
-
-
+def find_neighbours(data):
+    x,y=tuple(data)
+    n = set()
+    if x >= 1 and grid[x - 1][y] == 0:
+        n.add((x - 1, y))
+    if x < dims[0] - 1 and grid[x + 1][y] == 0:
+        n.add((x + 1, y))
+    if y >= 1 and grid[x][y - 1] == 0:
+        n.add((x, y - 1))
+    if y < dims[1] - 1 and grid[x][y + 1] ==0:
+        n.add((x, y + 1))
+    return n
 
 
 
@@ -64,12 +43,35 @@ start_x = np.random.randint(grid.shape[0])
 start_y = np.random.randint(grid.shape[1])
 grid[start_x][start_y] = 1
 
-root=Node((start_x,start_y))
-nb_s=root.find_neighbour()
-nx, ny = random.choice(tuple(nb_s))
-grid[nx][ny]=1
-root.left=Node((nx,ny))
-print(start_x,start_y,nx,ny)
+def find_neighbours(data):
+    x,y=tuple(data)
+    n = set()
+    if x >= 1 and grid[x - 1][y] == 0:
+        n.add((x - 1, y))
+    if x < dims[0] - 1 and grid[x + 1][y] == 0:
+        n.add((x + 1, y))
+    if y >= 1 and grid[x][y - 1] == 0:
+        n.add((x, y - 1))
+    if y < dims[1] - 1 and grid[x][y + 1] ==0:
+        n.add((x, y + 1))
+    return n
+
+
+Queue=[]
+grid = np.zeros((dims[0], dims[1]))
+start_x = np.random.randint(grid.shape[0])
+start_y = np.random.randint(grid.shape[1])
+grid[start_x][start_y] = 1
+Queue.append((start_x,start_y))
+while Queue:
+    nb_s=find_neighbours(Queue[-1])
+    if nb_s:
+        x, y = random.choice(tuple(nb_s))
+        Queue.append((x,y))
+        grid[x][y]=1
+    else:
+        Queue.pop()
+        
 
 
 recolor = WHITE
