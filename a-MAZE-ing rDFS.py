@@ -19,7 +19,16 @@ class Node:
         grid[self.a][self.b]=1
 
     def find_neighbour(self):
-        print(self.a,self.b)
+        n = set()
+        if self.a >= 1 and grid[self.a - 1][self.b] == 0:
+            n.add((self.a - 1, self.b))
+        if self.a < dims[0] - 1 and grid[self.a + 1][self.b] == 0:
+            n.add((self.a + 1, self.b))
+        if self.b  >= 1 and grid[self.a][self.b - 1] == 0:
+            n.add((self.a, self.b - 1))
+        if self.b  < dims[1] - 1 and grid[self.a][self.b + 1] == 0:
+            n.add((self.a, self.b + 1))
+        return n
 
 
 #grid position is the data of node
@@ -56,7 +65,11 @@ start_y = np.random.randint(grid.shape[1])
 grid[start_x][start_y] = 1
 
 root=Node((start_x,start_y))
-root.find_neighbour()
+nb_s=root.find_neighbour()
+nx, ny = random.choice(tuple(nb_s))
+grid[nx][ny]=1
+root.left=Node((nx,ny))
+print(start_x,start_y,nx,ny)
 
 
 recolor = WHITE
