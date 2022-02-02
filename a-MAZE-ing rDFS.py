@@ -6,13 +6,12 @@ import time
 width = 10
 height = 10
 margin = 3
-dims = [50, 50]
+dims = [50,50]
 size = (dims[1] * (width + margin) + margin, dims[0] * (height + margin) + margin)
 
 
-
 def find_neighbours(data):
-    x,y=tuple(data)
+    x, y = tuple(data)
     n = set()
     if x >= 1 and grid[x - 1][y] == 0:
         n.add((x - 1, y))
@@ -20,11 +19,31 @@ def find_neighbours(data):
         n.add((x + 1, y))
     if y >= 1 and grid[x][y - 1] == 0:
         n.add((x, y - 1))
-    if y < dims[1] - 1 and grid[x][y + 1] ==0:
+    if y < dims[1] - 1 and grid[x][y + 1] == 0:
         n.add((x, y + 1))
     return n
 
+def debuild_walls(x,y,nx,ny):
+    #print(x,y,nx,ny)
+    if x != nx:
+        if x > nx:
+            pygame.draw.rect(screen, GREEN,
+                             (margin + nx * (width + margin), margin + y * (height + margin), 2 * width + margin,
+                              height))
+        else:
+            pygame.draw.rect(screen, GREEN,
+                             (
+                             margin + x * (width + margin), margin + y * (height + margin), 2 * width + margin, height))
 
+    else:
+        if y > ny:
+            pygame.draw.rect(screen, GREEN,
+                             (margin + x * (width + margin), margin + ny * (height + margin), width,
+                              2 * height + margin))
+        else:
+            pygame.draw.rect(screen, GREEN,
+                             (
+                             margin + x * (width + margin), margin + y * (height + margin), width, 2 * height + margin))
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -43,36 +62,28 @@ start_x = np.random.randint(grid.shape[0])
 start_y = np.random.randint(grid.shape[1])
 grid[start_x][start_y] = 1
 
-def find_neighbours(data):
-    x,y=tuple(data)
-    n = set()
-    if x >= 1 and grid[x - 1][y] == 0:
-        n.add((x - 1, y))
-    if x < dims[0] - 1 and grid[x + 1][y] == 0:
-        n.add((x + 1, y))
-    if y >= 1 and grid[x][y - 1] == 0:
-        n.add((x, y - 1))
-    if y < dims[1] - 1 and grid[x][y + 1] ==0:
-        n.add((x, y + 1))
-    return n
 
 
-Queue=[]
+Queue = []
 grid = np.zeros((dims[0], dims[1]))
-start_x = np.random.randint(grid.shape[0])
-start_y = np.random.randint(grid.shape[1])
-grid[start_x][start_y] = 1
-Queue.append((start_x,start_y))
+nx = np.random.randint(grid.shape[0])
+ny = np.random.randint(grid.shape[1])
+grid[nx][ny] = 1
+Queue.append((nx, ny))
 while Queue:
-    nb_s=find_neighbours(Queue[-1])
+    #time.sleep(0.1)
+    nb_s = find_neighbours(Queue[-1])
+    nx,ny=tuple(Queue[-1])
     if nb_s:
-        x, y = random.choice(tuple(nb_s))
+        x,y = random.choice(tuple(nb_s))
         Queue.append((x,y))
-        grid[x][y]=1
+        grid[x][y] = 1
+        debuild_walls(x,y,nx,ny)
     else:
         Queue.pop()
-        
 
+    #nx,ny=x,y  #das hier muss es sein.. b
+    pygame.display.flip()
 
 recolor = WHITE
 
@@ -88,6 +99,7 @@ for row in range(dims[0]):
                 recolor = BLUE
         pygame.draw.rect(screen, recolor,
                          (margin + column * (width + margin), margin + row * (height + margin), width, height))
+
 
 pygame.display.flip()
 
@@ -108,7 +120,6 @@ while not done:
             gridpos_x = x // (width + margin)  #
             gridpos_y = y // (height + margin)
             grid[gridpos_x][gridpos_y] = 1
-
 
 
     clock.tick(60)
