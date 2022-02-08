@@ -46,40 +46,12 @@ def debuild_walls(x,y,nx,ny):
                              margin + x * (width + margin), margin + y * (height + margin), width, 2 * height + margin))
 
 
-def debuild_path(x,y,nx,ny):
-    if x != nx:
-        if x > nx:
-            pygame.draw.rect(screen, WHITE,
-                             (margin + nx * (width + margin), margin + y * (height + margin), 2 * width + margin,
-                              height))
-            pygame.draw.rect(screen, BLACK,
-                             (margin +width+ nx * (width + margin), margin + y * (height + margin),  margin,
-                              height))
-        else:
-            pygame.draw.rect(screen, WHITE,
-                             (
-                             margin + x * (width + margin), margin + y * (height + margin), 2 * width + margin, height))
-            pygame.draw.rect(screen, BLACK,
-                     (margin + width + x * (width + margin), margin + y * (height + margin), margin,
-                      height))
-    else:
-        if y > ny:
-            pygame.draw.rect(screen, WHITE,
-                             (margin + x * (width + margin), margin + ny * (height + margin), width,
-                              2 * height + margin))
-            pygame.draw.rect(screen, BLACK,
-                             (margin + x * (width + margin), margin +height+ ny * (height + margin), width,
-                              margin))
-
-        else:
-            pygame.draw.rect(screen, WHITE,
-                             (
-                             margin + x * (width + margin), margin + y * (height + margin), width, 2 * height + margin))
-            pygame.draw.rect(screen, BLACK,
-                             (margin + x * (width + margin), margin + height + y * (height + margin), width,
-                              margin))
-
-
+def draw_path(x,y):
+    pygame.draw.rect(screen, RED,(margin + x * (width + margin), margin + y * (height + margin), width , height))
+    pygame.display.flip()
+def del_path(x,y):
+    pygame.draw.rect(screen, WHITE, (margin + x * (width + margin), margin + y * (height + margin), width, height))
+    pygame.display.flip()
 
 
 BLACK = (0, 0, 0)
@@ -125,41 +97,33 @@ for x in range(dims[0]):
         unused_cell_list.append((x,y))
 
 unused_cell_list.remove((start_x,start_y))
-
 #init
 path=[]
-
-
 while unused_cell_list:
     #Initiere random Anfang, nachdem path geleert wurde
     next_cell=random.choice(tuple(unused_cell_list))
     path.append((next_cell)) #El in Path einfügen als erstes Element
     ##Loop until ein teil des Mazes erreicht wird
     while True:
-
         f_s=find_frontier(next_cell) #Finde angrenzende Elemente, die nicht direkt davor besucht wurden
         if path and path[-1] in f_s:
             f_s.remove(path[-1]) #Falls direkt davor besucht, nicht in diese Richtung gehen
         next_cell=random.choice(tuple(f_s)) #Zufällige erlaubte Richtung
-
         path.append(next_cell)  #
-        #print(path)
+        x, y = next_cell
+        draw_path(x,y)
+
 
         if next_cell in path[:-1]:  #Falls die nächste zufällige Zelle bereits im Path liegt:
             deleted_path=path[path.index(next_cell)+1:]
             path=path[:path.index(next_cell)+1] # Den loop entfernen ##sollte jetzt richtig sein
+            print('aaa',path,'bbb',deleted_path)
             for id,ce in enumerate(deleted_path[:-1]):
                 c1,c2=ce
-                cx,cy=deleted_path[id+1]
-                #debuild_path(c1,c2, cy,cy)
-            pygame.display.flip()
+                del_path(c1,c2)
 
 
-
-        x,y=next_cell
-        #break
         if grid[x][y]==1:   #Falls die neue Zelle Teil des Maze ist:
-            #for el,el2 in path[:-1]:
             for idx, cel in enumerate(path[:-1]):
                 time.sleep(0.01)
                 el,el2=cel
@@ -168,17 +132,11 @@ while unused_cell_list:
                 ###Labyrinth zeichnen wäre noch ne gute Idee
                 nx,ny=path[idx + 1]
                 debuild_walls(el,el2, nx, ny)
-
-
-                #debuild_walls(x, y, nx, ny)
                 pygame.display.flip()
 
             path=[]     #Path leeren
             break
 
-
-        #break
-    #unused_cell_list = []
 
 
 done = False
