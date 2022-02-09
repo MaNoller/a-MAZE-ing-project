@@ -1,0 +1,77 @@
+import numpy as np
+import random
+
+def find_neighbours(x, y):
+    n = set()
+    if x >= 1 and grid[x - 1][y] == 1:
+        n.add((x - 1, y))
+    if x < dims[0] - 1 and grid[x + 1][y] == 1:
+        n.add((x + 1, y))
+    if y >= 1 and grid[x][y - 1] == 1:
+        n.add((x, y - 1))
+    if y < dims[1] - 1 and grid[x][y + 1] == 1:
+        n.add((x, y + 1))
+    return n
+
+def find_frontier(x, y):
+    f = set()
+    if x >= 1 and grid[x - 1][y] == 0:
+        f.add((x - 1, y))
+    if x < dims[0] - 1 and grid[x + 1][y] == 0:
+        f.add((x + 1, y))
+    if y >= 1 and grid[x][y - 1] == 0:
+        f.add((x, y - 1))
+    if y < dims[1] - 1 and grid[x][y + 1] == 0:
+        f.add((x, y + 1))
+    return f
+
+def find_hunt():
+    #print('angang')
+    for row in range(dims[0]):
+        #print(row, dims[0])
+        for column in range(dims[1]):
+            if grid[column][row]==0:
+                #print('ha=')
+                nb_set= find_neighbours(column,row)
+                #print('hehe', column,row, grid[column][row])
+                #print(nb_set)
+                if nb_set:
+                    #print('JO')
+                    nx, ny = random.choice(tuple(nb_set))
+                    x,y=column,row
+                    #grid[x][y] = 1
+                    return x,y,nx,ny
+    
+                    
+  
+    
+width = 10
+height = 10
+margin = 3
+dims = [5,5]
+size = (dims[1] * (width + margin) + margin, dims[0] * (height + margin) + margin)
+
+grid = np.zeros((dims[0], dims[1]))
+start_x = np.random.randint(grid.shape[0])
+start_y = np.random.randint(grid.shape[1])
+grid[start_x][start_y] = 1
+last_cell=(start_x,start_y)
+fr = find_frontier(start_x, start_y)
+hunt=True
+while hunt:
+    try:
+        x,y=random.choice(tuple(fr))
+        grid[x][y]=1
+        #debuild_walls(x, y, nx, ny)
+        fr=find_frontier(x,y)
+        #print(grid)
+    except:
+        out=find_hunt()
+        if not out:
+            #print('out',out)
+            break
+        else:
+            #print('AAAA',out)
+            x,y,nx,ny=out
+        #print('hunting...', x,y,nx,ny)
+            grid[x][y]=1
