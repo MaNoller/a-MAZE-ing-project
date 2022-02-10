@@ -1,5 +1,47 @@
+import pygame
 import numpy as np
 import random
+import time
+
+
+
+
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+GREEN = (0, 255, 0)
+RED = (255, 0, 0)
+BLUE = (0, 0, 255)
+
+width = 10
+height = 10
+margin = 3
+dims = [50,50]
+size = (dims[1] * (width + margin) + margin, dims[0] * (height + margin) + margin)
+
+
+
+
+def debuild_walls(x,y,nx,ny):
+    if x != nx:
+        if x > nx:
+            pygame.draw.rect(screen, GREEN,
+                             (margin + nx * (width + margin), margin + y * (height + margin), 2 * width + margin,
+                              height))
+        else:
+            pygame.draw.rect(screen, GREEN,
+                             (
+                             margin + x * (width + margin), margin + y * (height + margin), 2 * width + margin, height))
+
+    else:
+        if y > ny:
+            pygame.draw.rect(screen, GREEN,
+                             (margin + x * (width + margin), margin + ny * (height + margin), width,
+                              2 * height + margin))
+        else:
+            pygame.draw.rect(screen, GREEN,
+                             (
+                             margin + x * (width + margin), margin + y * (height + margin), width, 2 * height + margin))
+
 
 def find_neighbours(x, y):
     n = set()
@@ -41,15 +83,8 @@ def find_hunt():
                     x,y=column,row
                     #grid[x][y] = 1
                     return x,y,nx,ny
-    
-                    
-  
-    
-width = 10
-height = 10
-margin = 3
-dims = [5,5]
-size = (dims[1] * (width + margin) + margin, dims[0] * (height + margin) + margin)
+
+
 
 grid = np.zeros((dims[0], dims[1]))
 start_x = np.random.randint(grid.shape[0])
@@ -57,21 +92,69 @@ start_y = np.random.randint(grid.shape[1])
 grid[start_x][start_y] = 1
 last_cell=(start_x,start_y)
 fr = find_frontier(start_x, start_y)
+
+
+pygame.init()
+
+screen = pygame.display.set_mode(size)
+screen.fill(BLACK)
+pygame.display.set_caption("My Game")
+# grid=[[1 for x in range(10)]for y in range(10)]
+
+
+recolor = WHITE
+
+for row in range(dims[0]):
+    for column in range(dims[1]):
+        recolor = WHITE
+        if grid[column][row] != 0:
+            if grid[column][row] == 1:
+                recolor = GREEN
+            elif grid[column][row] == 2:
+                recolor = RED
+            else:
+                recolor = BLUE
+        pygame.draw.rect(screen, recolor,
+                         (margin + column * (width + margin), margin + row * (height + margin), width, height))
+
+pygame.display.flip()
+
+
 hunt=True
 while hunt:
+    time.sleep(0.01)
     try:
+        nx,ny=x,y
+        print(fr)
         x,y=random.choice(tuple(fr))
         grid[x][y]=1
-        #debuild_walls(x, y, nx, ny)
+        debuild_walls(x, y, nx, ny)
+        pygame.display.flip()
         fr=find_frontier(x,y)
-        #print(grid)
     except:
         out=find_hunt()
         if not out:
-            #print('out',out)
             break
         else:
-            #print('AAAA',out)
             x,y,nx,ny=out
-        #print('hunting...', x,y,nx,ny)
+            debuild_walls(x, y, nx, ny)
+            pygame.display.flip()
             grid[x][y]=1
+            fr = find_frontier(x, y)
+
+done = False
+
+clock = pygame.time.Clock()
+
+# -------- Main Program Loop -----------
+while not done:
+    # --- Main event loop
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            done = True
+
+
+    clock.tick(60)
+
+# Close the window and quit.
+pygame.quit()
