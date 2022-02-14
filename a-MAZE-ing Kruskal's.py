@@ -6,9 +6,11 @@ import time
 width = 10
 height = 10
 margin = 3
-dims = [50,50]
+dims = [4,4]
 # print('dims1:' ,dims[1])
 size = (dims[1] * (width + margin) + margin, dims[0] * (height + margin) + margin)
+
+WallGrid=np.full([dims[0], dims[1]],'', dtype=object)
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -28,27 +30,48 @@ start_x = np.random.randint(grid.shape[0])
 start_y = np.random.randint(grid.shape[1])
 grid[start_x][start_y] = 1
 
+def draw_dirs(x,y,nx,ny):
 
-def debuild_walls(x,y,nx,ny):
+    if x!=nx:
+        if x>nx:
+            WallGrid[x][y]+=('U')
+            WallGrid[nx][y]+=('D')
+        else:
+            WallGrid[x][y]+=('D')
+            WallGrid[nx][y]+=('U')
+
+    else:
+        if y<ny:
+            WallGrid[x][y]+=('R')
+            WallGrid[x][ny]+=('L')
+        else:
+            WallGrid[x][y]+=('L')
+            WallGrid[x][ny]+=('R')
+    print(WallGrid)
+
+
+def debuild_walls(x,y,nx,ny): #nx=row, ny=column
+    #print(x,y,nx,ny)
     if x != nx:
         if x > nx:
             pygame.draw.rect(screen, GREEN,
-                             (margin + nx * (width + margin), margin + y * (height + margin), 2 * width + margin,
-                              height))
+                             ( margin + y * (width + margin), margin + nx * (height + margin),width,
+                              2*height+margin))
         else:
             pygame.draw.rect(screen, GREEN,
-                             (
-                             margin + x * (width + margin), margin + y * (height + margin), 2 * width + margin, height))
+                             (margin + y * (width + margin),margin + x * (height + margin),   width,
+                              2*height+margin))
 
     else:
         if y > ny:
             pygame.draw.rect(screen, GREEN,
-                             (margin + x * (width + margin), margin + ny * (height + margin), width,
-                              2 * height + margin))
+                             ( margin + ny * (width + margin),margin + x * (height + margin), 2*width+margin,
+                              height))
         else:
             pygame.draw.rect(screen, GREEN,
-                             (
-                             margin + x * (width + margin), margin + y * (height + margin), width, 2 * height + margin))
+                             (margin + y * (width + margin),margin + x * (height + margin),  2*width+margin,
+                              height))
+
 
 
 recolor = WHITE
@@ -56,10 +79,10 @@ recolor = WHITE
 for row in range(dims[0]):
     for column in range(dims[1]):
         recolor = WHITE
-        if grid[column][row] != 0:
-            if grid[column][row] == 1:
+        if grid[row][column] != 0:
+            if grid[row][column] == 1:
                 recolor = GREEN
-            elif grid[column][row] == 2:
+            elif grid[row][column] == 2:
                 recolor = RED
             else:
                 recolor = BLUE
@@ -111,6 +134,7 @@ for wall in walls2:
         cell_set_list.append(s1.union(s2))
         debuild_walls(c1[0],c1[1],c2[0],c2[1])
         pygame.display.flip()
+        draw_dirs(c1[0],c1[1],c2[0],c2[1])
 
 
 while not done:
