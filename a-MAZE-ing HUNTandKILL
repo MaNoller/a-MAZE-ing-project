@@ -15,32 +15,50 @@ BLUE = (0, 0, 255)
 width = 10
 height = 10
 margin = 3
-dims = [50,50]
+dims = [6,4]
 size = (dims[1] * (width + margin) + margin, dims[0] * (height + margin) + margin)
+WallGrid=np.full([dims[0], dims[1]],'', dtype=object)
+def draw_dirs(x,y,nx,ny):
 
+    if x!=nx:
+        if x>nx:
+            WallGrid[x][y]+=('U')
+            WallGrid[nx][y]+=('D')
+        else:
+            WallGrid[x][y]+=('D')
+            WallGrid[nx][y]+=('U')
 
+    else:
+        if y<ny:
+            WallGrid[x][y]+=('R')
+            WallGrid[x][ny]+=('L')
+        else:
+            WallGrid[x][y]+=('L')
+            WallGrid[x][ny]+=('R')
+    print(WallGrid)
 
-
-def debuild_walls(x,y,nx,ny):
+def debuild_walls(x,y,nx,ny): #nx=row, ny=column
+    #print(x,y,nx,ny)
     if x != nx:
         if x > nx:
             pygame.draw.rect(screen, GREEN,
-                             (margin + nx * (width + margin), margin + y * (height + margin), 2 * width + margin,
-                              height))
+                             ( margin + y * (width + margin), margin + nx * (height + margin),width,
+                              2*height+margin))
         else:
             pygame.draw.rect(screen, GREEN,
-                             (
-                             margin + x * (width + margin), margin + y * (height + margin), 2 * width + margin, height))
+                             (margin + y * (width + margin),margin + x * (height + margin),   width,
+                              2*height+margin))
 
     else:
         if y > ny:
             pygame.draw.rect(screen, GREEN,
-                             (margin + x * (width + margin), margin + ny * (height + margin), width,
-                              2 * height + margin))
+                             ( margin + ny * (width + margin),margin + x * (height + margin), 2*width+margin,
+                              height))
         else:
             pygame.draw.rect(screen, GREEN,
-                             (
-                             margin + x * (width + margin), margin + y * (height + margin), width, 2 * height + margin))
+                             (margin + y * (width + margin),margin + x * (height + margin),  2*width+margin,
+                              height))
+
 
 
 def find_neighbours(x, y):
@@ -70,18 +88,12 @@ def find_frontier(x, y):
 def find_hunt():
     #print('angang')
     for row in range(dims[0]):
-        #print(row, dims[0])
         for column in range(dims[1]):
-            if grid[column][row]==0:
-                #print('ha=')
-                nb_set= find_neighbours(column,row)
-                #print('hehe', column,row, grid[column][row])
-                #print(nb_set)
+            if grid[row][column]==0:
+                nb_set= find_neighbours(row,column)
                 if nb_set:
-                    #print('JO')
                     nx, ny = random.choice(tuple(nb_set))
-                    x,y=column,row
-                    #grid[x][y] = 1
+                    x,y=row,column
                     return x,y,nx,ny
 
 
@@ -107,10 +119,10 @@ recolor = WHITE
 for row in range(dims[0]):
     for column in range(dims[1]):
         recolor = WHITE
-        if grid[column][row] != 0:
-            if grid[column][row] == 1:
+        if grid[row][column] != 0:
+            if grid[row][column] == 1:
                 recolor = GREEN
-            elif grid[column][row] == 2:
+            elif grid[row][column] == 2:
                 recolor = RED
             else:
                 recolor = BLUE
@@ -125,10 +137,11 @@ while hunt:
     time.sleep(0.01)
     try:
         nx,ny=x,y
-        print(fr)
+        #print(fr)
         x,y=random.choice(tuple(fr))
         grid[x][y]=1
         debuild_walls(x, y, nx, ny)
+        draw_dirs(x, y, nx,ny)
         pygame.display.flip()
         fr=find_frontier(x,y)
     except:
@@ -138,6 +151,7 @@ while hunt:
         else:
             x,y,nx,ny=out
             debuild_walls(x, y, nx, ny)
+            draw_dirs(x, y, nx,ny)
             pygame.display.flip()
             grid[x][y]=1
             fr = find_frontier(x, y)
