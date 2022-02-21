@@ -229,7 +229,7 @@ used_cell_list.append(curr_cell)
 while unused_cell_dict:
     curr_cell=min(unused_cell_dict, key=unused_cell_dict.get)
     cx,cy=curr_cell
-    used_cell_list=curr_cell
+    used_cell_list.append(curr_cell)
     if curr_cell==end_cell:
         break
     print(WallGrid)
@@ -244,12 +244,14 @@ while unused_cell_dict:
         if el=='L':
             next_cell=(cx,cy-1)
         if next_cell not in used_cell_list:
-            dist=unused_cell_dict[used_cell_list]+1
+            dist=unused_cell_dict[curr_cell]+1
+            #print(unused_cell_dict)
             if dist < unused_cell_dict[next_cell]:
                 unused_cell_dict[next_cell]=dist
     unused_cell_dict.pop(curr_cell)
-    
-    break
+print(unused_cell_dict)
+
+
 
 
 
