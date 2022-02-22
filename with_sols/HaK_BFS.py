@@ -9,6 +9,8 @@ import time
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
+GREEN_C = (0, 255, 255)
+GREEN_F = (0, 255, 100)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 
@@ -150,6 +152,12 @@ def find_hunt():
 def draw_path(x,y):
     pygame.draw.rect(screen, RED,(margin + y * (width + margin), margin + x * (height + margin), width , height))
     pygame.display.flip()
+def draw_current(x,y):
+    pygame.draw.rect(screen, GREEN_C,(margin + y * (width + margin), margin + x * (height + margin), width , height))
+    pygame.display.flip()
+def draw_frontier(x,y):
+    pygame.draw.rect(screen, BLUE,(margin + y * (width + margin), margin + x * (height + margin), width , height))
+    pygame.display.flip()
 
 grid = np.zeros((dims[0], dims[1]))
 start_x = np.random.randint(grid.shape[0])
@@ -218,14 +226,16 @@ frontier.append(start_cell)
 explored.append(start_cell)
 mapping={}
 while frontier:
+    time.sleep(0.1)
     current=frontier.pop(0)
     cx,cy=current
+    draw_current(cx,cy)
+
     if current==end_cell:
-        print(mapping)
         way=find_way(end_cell)
-        print(way)
         break
     for el in WallGrid[cx][cy]:
+        time.sleep(0.05)
         if el=='D':
             next_cell=(cx+1,cy)
         if el== 'U':
@@ -236,6 +246,8 @@ while frontier:
             next_cell=(cx,cy-1)
         if next_cell not in explored:
             frontier.append(next_cell)
+            fx,fy=next_cell
+            draw_frontier(fx,fy)
             explored.append(next_cell)
             mapping[next_cell] = (cx, cy)
 
