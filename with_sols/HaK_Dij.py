@@ -11,6 +11,7 @@ WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
+GREEN_C = (0, 255, 255)
 
 width = 10
 height = 10
@@ -150,6 +151,13 @@ def find_hunt():
 def draw_path(x,y):
     pygame.draw.rect(screen, RED,(margin + y * (width + margin), margin + x * (height + margin), width , height))
     pygame.display.flip()
+def draw_current(x,y):
+    pygame.draw.rect(screen, GREEN_C,(margin + y * (width + margin), margin + x * (height + margin), width , height))
+    pygame.display.flip()
+def draw_frontier(x,y):
+    pygame.draw.rect(screen, BLUE,(margin + y * (width + margin), margin + x * (height + margin), width , height))
+    pygame.display.flip()
+
 
 grid = np.zeros((dims[0], dims[1]))
 start_x = np.random.randint(grid.shape[0])
@@ -224,17 +232,22 @@ unused_cell_dict={el:float('inf') for el in unused_cell_list}
 del unused_cell_list
 unused_cell_dict[start_cell]=0
 curr_cell=start_cell
+
 used_cell_list.append(curr_cell)
 
 while unused_cell_dict:
+    time.sleep(0.1)
     curr_cell=min(unused_cell_dict, key=unused_cell_dict.get)
     cx,cy=curr_cell
+    draw_current(cx, cy)
     used_cell_list.append(curr_cell)
     if curr_cell==end_cell:
+        way = find_way(end_cell)
         break
-    print(WallGrid)
-    print(WallGrid[curr_cell])
+    #print(WallGrid)
+    #print(WallGrid[curr_cell])
     for el in WallGrid[curr_cell]:
+        time.sleep(0.05)
         if el=='D':
             next_cell=(cx+1,cy)
         if el== 'U':
@@ -245,11 +258,22 @@ while unused_cell_dict:
             next_cell=(cx,cy-1)
         if next_cell not in used_cell_list:
             dist=unused_cell_dict[curr_cell]+1
+            fx, fy = next_cell
+            draw_frontier(fx, fy)
             #print(unused_cell_dict)
             if dist < unused_cell_dict[next_cell]:
                 unused_cell_dict[next_cell]=dist
+                mapping[next_cell] = (cx, cy)
     unused_cell_dict.pop(curr_cell)
-print(unused_cell_dict)
+
+
+#print(unused_cell_dict)
+for id, el in enumerate(way[:-1]):
+    time.sleep(0.01)
+    x,y=el
+    nx,ny=way[id+1]
+    draw_sol(x,y,nx,ny)
+    pygame.display.flip()
 
 
 
