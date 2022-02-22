@@ -8,10 +8,10 @@ import time
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-GREEN_C = (0, 255, 255)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
+GREEN_C = (0, 255, 255)
 
 width = 10
 height = 10
@@ -225,14 +225,16 @@ frontier.append(start_cell)
 explored.append(start_cell)
 mapping={}
 while frontier:
+    time.sleep(0.1)
     current=frontier.pop()
     cx,cy=current
+    draw_current(cx, cy)
+
     if current==end_cell:
-        print(mapping)
         way=find_way(end_cell)
-        print(way)
         break
     for el in WallGrid[cx][cy]:
+        time.sleep(0.05)
         if el=='D':
             next_cell=(cx+1,cy)
         if el== 'U':
@@ -243,6 +245,8 @@ while frontier:
             next_cell=(cx,cy-1)
         if next_cell not in explored:
             frontier.append(next_cell)
+            fx, fy = next_cell
+            draw_frontier(fx, fy)
             explored.append(next_cell)
             mapping[next_cell] = (cx, cy)
 
