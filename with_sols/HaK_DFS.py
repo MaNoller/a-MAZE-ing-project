@@ -8,6 +8,7 @@ import time
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
+GREEN_C = (0, 255, 255)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
@@ -149,6 +150,12 @@ def find_hunt():
 
 def draw_path(x,y):
     pygame.draw.rect(screen, RED,(margin + y * (width + margin), margin + x * (height + margin), width , height))
+    pygame.display.flip()
+def draw_current(x,y):
+    pygame.draw.rect(screen, GREEN_C,(margin + y * (width + margin), margin + x * (height + margin), width , height))
+    pygame.display.flip()
+def draw_frontier(x,y):
+    pygame.draw.rect(screen, BLUE,(margin + y * (width + margin), margin + x * (height + margin), width , height))
     pygame.display.flip()
 
 grid = np.zeros((dims[0], dims[1]))
