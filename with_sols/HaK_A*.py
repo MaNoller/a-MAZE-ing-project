@@ -19,6 +19,8 @@ WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
+GREEN_C = (0, 255, 255)
+
 
 width = 10
 height = 10
@@ -35,8 +37,6 @@ while frontier:
     current=frontier.pop(0)
     if current==end_cell:
         break
-
-
 
 
 size = (dims[1] * (width + margin) + margin, dims[0] * (height + margin) + margin)
@@ -60,15 +60,6 @@ def draw_dirs(x,y,nx,ny):
             WallGrid[x][ny]+=('R')
     #print(WallGrid)
 
-def find_way(cell):
-    way=[]
-    while True:
-        way.append(cell)
-        cell=mapping[cell]
-        if cell==start_cell:
-            way.append(start_cell)
-            break
-    return way
 
 def draw_sol(x,y,nx,ny): #nx=row, ny=column
     #print(x,y,nx,ny)
@@ -169,6 +160,13 @@ def find_hunt():
 def draw_path(x,y):
     pygame.draw.rect(screen, RED,(margin + y * (width + margin), margin + x * (height + margin), width , height))
     pygame.display.flip()
+def draw_current(x,y):
+    pygame.draw.rect(screen, GREEN_C,(margin + y * (width + margin), margin + x * (height + margin), width , height))
+    pygame.display.flip()
+def draw_frontier(x,y):
+    pygame.draw.rect(screen, BLUE,(margin + y * (width + margin), margin + x * (height + margin), width , height))
+    pygame.display.flip()
+
 
 grid = np.zeros((dims[0], dims[1]))
 start_x = np.random.randint(grid.shape[0])
@@ -250,12 +248,15 @@ used_elements=PriorityQueue()
 used_elements.put((sum_of_costs_dict[start_cell],sum_of_costs_dict[start_cell],start_cell))
 
 while not used_elements.empty():
+    time.sleep(0.1)
     curr_cell=used_elements.get()[2]
     cx, cy = curr_cell
+    draw_current(cx, cy)
     if curr_cell==end_cell:
         way = find_way(end_cell)
         break
     for el in WallGrid[curr_cell]:
+        time.sleep(0.05)
         if el=='D':
             next_cell=(cx+1,cy)
         if el== 'U':
@@ -265,9 +266,12 @@ while not used_elements.empty():
         if el=='L':
             next_cell=(cx,cy-1)
 
+
         temp_cost=cost_dict[curr_cell]+1
         temp_sum=temp_cost+manhattan(next_cell,end_cell)
         if temp_sum < sum_of_costs_dict[next_cell]:
+            fx, fy = next_cell
+            draw_frontier(fx, fy)
             cost_dict[next_cell]=temp_cost
             sum_of_costs_dict[next_cell]=temp_sum
             used_elements.put((temp_sum,manhattan(next_cell,end_cell),next_cell))
