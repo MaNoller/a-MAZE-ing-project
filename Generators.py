@@ -145,6 +145,28 @@ def find_frontier_prym(x, y):
         grid[x][y + 1] = 2
     return f
 
+def draw_path(x,y):
+    pygame.draw.rect(screen, RED,(margin + y * (width + margin), margin + x * (height + margin), width , height))
+    pygame.display.flip()
+def del_path(x,y):
+    pygame.draw.rect(screen, WHITE, (margin + y * (width + margin), margin + x * (height + margin), width, height))
+    pygame.display.flip()
+
+
+def find_frontier_wilsons(inputarg):
+    x,y=inputarg
+    f = set()
+    if x >= 1 :
+        f.add((x - 1, y))
+    if x < dims[0] - 1 :
+        f.add((x + 1, y))
+    if y >= 1 :
+        f.add((x, y - 1))
+    if y < dims[1] - 1:
+        f.add((x, y + 1))
+    return f
+
+
 
 def init(rows,columns):
     global dims,size,width,height,margin
@@ -275,13 +297,101 @@ def rDFS():
         pygame.display.flip()
 
 
-init(10,10)
+def Sidewinder():
+    dir=[0,1]#0 is west, 1 is north
+    for el in range(dims[1]-1):
+        debuild_walls(el+1,0,el,0)
+        draw_dirs(el+1,0,el,0)
+        pygame.display.flip()
+    for row in range(1,dims[0]):
+
+        run=list()
+        for column in range(0,dims[1]):
+            #print(row,column)
+            run.append((column,row))
+            #print(run)
+            walk_dir=random.choice(dir)
+            if column==dims[1]-1:
+                walk_dir=1
+
+            if walk_dir==1:
+                #print(row,column)
+                cell=random.choice(run)#
+                run=list()
+                debuild_walls(cell[0],cell[1],cell[0],cell[1]-1)
+                draw_dirs(cell[0],cell[1],cell[0],cell[1]-1)
+                pygame.display.flip()
+                pass
+            elif column<dims[1]:
+                debuild_walls(column+1,row,column,row)
+                draw_dirs(column+1,row,column,row)
+                pygame.display.flip()
+
+
+def Wilsons():
+    unused_cell_list = []
+    for x in range(dims[0]):
+        for y in range(dims[1]):
+            unused_cell_list.append((x,y))
+    for row in range(dims[0]):
+        for column in range(dims[1]):
+            recolor = WHITE
+            if grid[row][column] != 0:
+                if grid[row][column] == 1:
+                    recolor = GREEN
+
+            pygame.draw.rect(screen, recolor,
+                             (margin + column * (width + margin), margin + row * (height + margin), width, height))
+
+    pygame.display.flip()
+    unused_cell_list.remove((start_x,start_y))
+    path=[]
+    while unused_cell_list:
+        next_cell=random.choice(tuple(unused_cell_list))
+        path.append((next_cell))
+        while True:
+            f_s=find_frontier_wilsons(next_cell)
+            if path and path[-1] in f_s:
+                f_s.remove(path[-1])
+            next_cell=random.choice(tuple(f_s))
+            path.append(next_cell)
+            x, y = next_cell
+            draw_path(x,y)
+
+
+            if next_cell in path[:-1]:
+                deleted_path=path[path.index(next_cell)+1:]
+                path=path[:path.index(next_cell)+1]
+                for id,ce in enumerate(deleted_path[:-1]):
+                    c1,c2=ce
+                    del_path(c1,c2)
+
+
+            if grid[x][y]==1:
+                for idx, cel in enumerate(path[:-1]):
+                    time.sleep(0.01)
+                    el,el2=cel
+                    grid[el][el2]=1
+                    unused_cell_list.remove((el,el2))
+                    nx,ny=path[idx + 1]
+                    debuild_walls(el,el2, nx, ny)
+                    draw_dirs(el,el2, nx, ny)
+                    pygame.display.flip()
+
+                path=[]
+                break
+
+
+
+
+init(30,30)
 #Binary_Tree()
 #HaK()
 #Kruskal()
 #Prym()
-rDFS()
-
+#rDFS()
+#Sidewinder()
+#Wilsons()
 
 done = False
 clock = pygame.time.Clock()
