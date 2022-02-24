@@ -92,6 +92,19 @@ def find_neighbours(x, y):
     if y < dims[1] - 1 and grid[x][y + 1] == 1:
         n.add((x, y + 1))
     return n
+def find_neighbours_rdfs(x,y):
+    n = set()
+    if x >= 1 and grid[x - 1][y] == 0:
+        n.add((x - 1, y))
+    if x < dims[0] - 1 and grid[x + 1][y] == 0:
+        n.add((x + 1, y))
+    if y >= 1 and grid[x][y - 1] == 0:
+        n.add((x, y - 1))
+    if y < dims[1] - 1 and grid[x][y + 1] == 0:
+        n.add((x, y + 1))
+    return n
+
+
 
 def find_hunt():
     #print('angang')
@@ -221,7 +234,7 @@ def Kruskal():
             pygame.display.flip()
             draw_dirs(c1[0],c1[1],c2[0],c2[1])
 
-def Prym(start_x,start_y):
+def Prym():
     Wall_set = set()
     fr = find_frontier(start_x, start_y)
     for el in fr:
@@ -243,13 +256,31 @@ def Prym(start_x,start_y):
             Wall_set.add(el)
         pygame.display.flip()
 
+def rDFS():
+    Queue = []
+    Queue.append((start_x, start_y))
+    while Queue:
+        time.sleep(0.005)
+        h,i= tuple(Queue[-1])
+        nb_s = find_neighbours_rdfs(h,i)
+        nx,ny=tuple(Queue[-1])
+        if nb_s:
+            x,y = random.choice(tuple(nb_s))
+            Queue.append((x,y))
+            grid[x][y] = 1
+            debuild_walls(x,y,nx,ny)
+            draw_dirs(x, y, nx, ny)
+        else:
+            Queue.pop()
+        pygame.display.flip()
 
 
 init(10,10)
 #Binary_Tree()
 #HaK()
 #Kruskal()
-Prym(start_x,start_y)
+#Prym()
+rDFS()
 
 
 done = False
