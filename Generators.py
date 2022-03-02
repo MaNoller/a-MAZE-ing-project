@@ -3,6 +3,31 @@ import numpy as np
 import random
 import time
 
+
+def draw_sol(x,y,nx,ny): #nx=row, ny=column
+    #print(x,y,nx,ny)
+    if x != nx:
+        if x > nx:
+            pygame.draw.rect(screen, RED,
+                             ( margin + y * (width + margin), margin + nx * (height + margin),width,
+                              2*height+margin))
+        else:
+            pygame.draw.rect(screen, RED,
+                             (margin + y * (width + margin),margin + x * (height + margin),   width,
+                              2*height+margin))
+
+    else:
+        if y > ny:
+            pygame.draw.rect(screen, RED,
+                             ( margin + ny * (width + margin),margin + x * (height + margin), 2*width+margin,
+                              height))
+        else:
+            pygame.draw.rect(screen, RED,
+                             (margin + y * (width + margin),margin + x * (height + margin),  2*width+margin,
+                              height))
+
+
+
 def draw_dirs(x,y,nx,ny):
     if x!=nx:
         if x>nx:
@@ -45,12 +70,13 @@ def init_pygame():
 
 
 def init_colors():
-    global BLACK,WHITE,GREEN,RED,BLUE
+    global BLACK,WHITE,GREEN,RED,BLUE,GREEN_C
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
     GREEN = (0, 255, 0)
     RED = (255, 0, 0)
     BLUE = (0, 0, 255)
+    GREEN_C = (0, 255, 255)
 
 def build_grid(dims):
     for row in range(dims[0]):
@@ -181,10 +207,12 @@ def init(rows,columns):
 
 
 
+
 def Binary_Tree():
-    time.sleep(1)
+    time.sleep(0.01)
     for row in range(dims[0]):
         for column in range(dims[1]):
+            time.sleep(0.01)
             f=find_frontier_bt(row,column)
             if f:
                 x,y=random.choice(tuple(f))
@@ -307,16 +335,13 @@ def Sidewinder():
 
         run=list()
         for column in range(0,dims[1]):
-            #print(row,column)
             run.append((column,row))
-            #print(run)
             walk_dir=random.choice(dir)
             if column==dims[1]-1:
                 walk_dir=1
 
             if walk_dir==1:
-                #print(row,column)
-                cell=random.choice(run)#
+                cell=random.choice(run)
                 run=list()
                 debuild_walls(cell[0],cell[1],cell[0],cell[1]-1)
                 draw_dirs(cell[0],cell[1],cell[0],cell[1]-1)
@@ -381,18 +406,124 @@ def Wilsons():
                 path=[]
                 break
 
+#####
+def find_way(cell):
+    way=[]
+    while True:
+        way.append(cell)
+        cell=mapping[cell]
+        if cell==start_cell:
+            way.append(start_cell)
+            break
+    return way
+
+def draw_current(x,y):
+    pygame.draw.rect(screen, GREEN_C,(margin + y * (width + margin), margin + x * (height + margin), width , height))
+    pygame.display.flip()
+def draw_frontier(x,y):
+    pygame.draw.rect(screen, BLUE,(margin + y * (width + margin), margin + x * (height + margin), width , height))
+    pygame.display.flip()
+#####
+def BFS():
+    global mapping, way, start_cell, end_cell
+    start_cell=(0,0)
+    end_cell=(dims[0]-1,dims[1]-1)
+    frontier=[]
+    explored=[]
+    frontier.append(start_cell)
+    explored.append(start_cell)
+    mapping={}
+    while frontier:
+        time.sleep(0.01)
+        current=frontier.pop(0)
+        cx,cy=current
+        draw_current(cx,cy)
+
+        if current==end_cell:
+            way=find_way(end_cell)
+            break
+        for el in WallGrid[cx][cy]:
+            time.sleep(0.05)
+            if el=='D':
+                next_cell=(cx+1,cy)
+            if el== 'U':
+                next_cell=(cx-1,cy)
+            if el=='R':
+                next_cell=(cx,cy+1)
+            if el=='L':
+                next_cell=(cx,cy-1)
+            if next_cell not in explored:
+                frontier.append(next_cell)
+                fx,fy=next_cell
+                draw_frontier(fx,fy)
+                explored.append(next_cell)
+                mapping[next_cell] = (cx, cy)
+
+
+def DFS():
+    global mapping, way,start_cell, end_cell
+    start_cell=(0,0)
+    end_cell=(dims[0]-1,dims[1]-1)
+    frontier=[]
+    explored=[]
+    frontier.append(start_cell)
+    explored.append(start_cell)
+    mapping={}
+    while frontier:
+        time.sleep(0.01)
+        current=frontier.pop()
+        cx,cy=current
+        draw_current(cx, cy)
+
+        if current==end_cell:
+            way=find_way(end_cell)
+            break
+        for el in WallGrid[cx][cy]:
+            time.sleep(0.05)
+            if el=='D':
+                next_cell=(cx+1,cy)
+            if el== 'U':
+                next_cell=(cx-1,cy)
+            if el=='R':
+                next_cell=(cx,cy+1)
+            if el=='L':
+                next_cell=(cx,cy-1)
+            if next_cell not in explored:
+                frontier.append(next_cell)
+                fx, fy = next_cell
+                draw_frontier(fx, fy)
+                explored.append(next_cell)
+                mapping[next_cell] = (cx, cy)
+
+
+def weg():
+    for id, el in enumerate(way[:-1]):
+        time.sleep(0.01)
+        x,y=el
+        nx,ny=way[id+1]
+        draw_sol(x,y,nx,ny)
+        pygame.display.flip()
 
 
 
-init(30,30)
-#Binary_Tree()
+
+#####
+
+
+init(10,10)
+Binary_Tree()
 #HaK()
 #Kruskal()
 #Prym()
 #rDFS()
 #Sidewinder()
 #Wilsons()
+#BFS()
+#DFS()
+weg()
 
+
+'''
 done = False
 clock = pygame.time.Clock()
 # -------- Main Program Loop -----------
@@ -403,4 +534,4 @@ while not done:
             done = True
     clock.tick(60)
 
-pygame.quit()
+pygame.quit()'''
