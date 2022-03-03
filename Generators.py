@@ -2,6 +2,7 @@ import pygame
 import numpy as np
 import random
 import time
+from queue import PriorityQueue
 
 
 def draw_sol(x,y,nx,ny): #nx=row, ny=column
@@ -205,6 +206,12 @@ def init(rows,columns):
     init_pygame()
     build_grid(dims)
 
+
+def manhattan(cell1,cell2):
+    x1,y1=cell1
+    x2,y2=cell2
+    dist=abs(x1-x2)+abs(y1-y2)
+    return dist
 
 
 
@@ -495,6 +502,108 @@ def DFS():
                 explored.append(next_cell)
                 mapping[next_cell] = (cx, cy)
 
+def DIJ():
+    global mapping, way, start_cell, end_cell
+    start_cell=(0,0)
+    end_cell=(dims[0]-1,dims[1]-1)
+
+    mapping={}
+    ###################
+    unused_cell_list=[]
+    used_cell_list=[]
+    for x in range(dims[0]):
+        for y in range(dims[1]):
+            unused_cell_list.append((x,y))
+    unused_cell_dict={el:float('inf') for el in unused_cell_list}
+    del unused_cell_list
+    unused_cell_dict[start_cell]=0
+    curr_cell=start_cell
+
+    used_cell_list.append(curr_cell)
+
+    while unused_cell_dict:
+        time.sleep(0.1)
+        curr_cell=min(unused_cell_dict, key=unused_cell_dict.get)
+        cx,cy=curr_cell
+        draw_current(cx, cy)
+        used_cell_list.append(curr_cell)
+        if curr_cell==end_cell:
+            way = find_way(end_cell)
+            break
+        #print(WallGrid)
+        #print(WallGrid[curr_cell])
+        for el in WallGrid[curr_cell]:
+            time.sleep(0.05)
+            if el=='D':
+                next_cell=(cx+1,cy)
+            if el== 'U':
+                next_cell=(cx-1,cy)
+            if el=='R':
+                next_cell=(cx,cy+1)
+            if el=='L':
+                next_cell=(cx,cy-1)
+            if next_cell not in used_cell_list:
+                dist=unused_cell_dict[curr_cell]+1
+                fx, fy = next_cell
+                draw_frontier(fx, fy)
+                #print(unused_cell_dict)
+                if dist < unused_cell_dict[next_cell]:
+                    unused_cell_dict[next_cell]=dist
+                    mapping[next_cell] = (cx, cy)
+        unused_cell_dict.pop(curr_cell)
+
+
+def AStar():
+    global mapping, way, start_cell, end_cell
+    start_cell = (0, 0)
+    end_cell = (dims[0] - 1, dims[1] - 1)
+
+    mapping = {}
+    ###################
+    unused_cell_list = []
+    used_cell_list = []
+    for x in range(dims[0]):
+        for y in range(dims[1]):
+            unused_cell_list.append((x, y))
+    cost_dict = {el: float('inf') for el in unused_cell_list}
+    del unused_cell_list
+    sum_of_costs_dict = cost_dict.copy()
+    cost_dict[start_cell] = 0
+    curr_cell = start_cell
+    sum_of_costs_dict[start_cell] = manhattan(start_cell, end_cell)
+
+    used_elements = PriorityQueue()
+    used_elements.put((sum_of_costs_dict[start_cell], sum_of_costs_dict[start_cell], start_cell))
+
+    while not used_elements.empty():
+        time.sleep(0.05)
+        curr_cell = used_elements.get()[2]
+        cx, cy = curr_cell
+        draw_current(cx, cy)
+        if curr_cell == end_cell:
+            way = find_way(end_cell)
+            break
+        for el in WallGrid[curr_cell]:
+            time.sleep(0.05)
+            if el == 'D':
+                next_cell = (cx + 1, cy)
+            if el == 'U':
+                next_cell = (cx - 1, cy)
+            if el == 'R':
+                next_cell = (cx, cy + 1)
+            if el == 'L':
+                next_cell = (cx, cy - 1)
+
+            temp_cost = cost_dict[curr_cell] + 1
+            temp_sum = temp_cost + manhattan(next_cell, end_cell)
+            if temp_sum < sum_of_costs_dict[next_cell]:
+                fx, fy = next_cell
+                draw_frontier(fx, fy)
+                cost_dict[next_cell] = temp_cost
+                sum_of_costs_dict[next_cell] = temp_sum
+                used_elements.put((temp_sum, manhattan(next_cell, end_cell), next_cell))
+                mapping[next_cell] = (cx, cy)
+
 
 def weg():
     for id, el in enumerate(way[:-1]):
@@ -520,6 +629,8 @@ Binary_Tree()
 #Wilsons()
 #BFS()
 #DFS()
+#DIJ()
+AStar()
 weg()
 
 
