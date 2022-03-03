@@ -1,8 +1,13 @@
+#!/usr/bin/env python
+
+import os
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame
 import numpy as np
 import random
 import time
 from queue import PriorityQueue
+import sys
 
 
 def draw_sol(x,y,nx,ny): #nx=row, ny=column
@@ -619,8 +624,8 @@ def weg():
 #####
 
 
-init(10,10)
-Binary_Tree()
+#init(10,10)
+#Binary_Tree()
 #HaK()
 #Kruskal()
 #Prym()
@@ -630,8 +635,43 @@ Binary_Tree()
 #BFS()
 #DFS()
 #DIJ()
-AStar()
-weg()
+#AStar()
+#weg()
+
+def search_fun(inp):
+    if inp=='Binary_Tree':
+        Binary_Tree()
+    elif inp=='HaK':
+        HaK()
+    elif inp=='Kruskal':
+        Kruskal()
+    elif inp=='Prym':
+        Prym()
+    elif inp=='rDFS':
+        rDFS()
+    elif inp=='Sidewinder':
+        Sidewinder()
+    elif inp=='Wilsons':
+        Wilsons()
+    elif inp=='BFS':
+        BFS()
+    elif inp=='DFS':
+        DFS()
+    elif inp=='DIJ':
+        DIJ()
+    elif inp== 'AStar':
+        AStar()
+    else:
+        print('FEHLER')
+
+
+if sys.argv[1] and sys.argv[2]:
+    init(int(sys.argv[1]),int(sys.argv[2]))
+if sys.argv[3]:
+    search_fun(sys.argv[3])
+if sys.argv[4]:
+    search_fun(sys.argv[4])
+    weg()
 
 
 '''
